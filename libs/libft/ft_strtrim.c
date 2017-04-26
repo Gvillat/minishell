@@ -29,5 +29,5 @@ char	*ft_strtrim(char const *s)
 		end--;
 	if ((unsigned int)end <= start)
 		return (ft_strnew(1));
-	return (ft_strsub(s, start, (end - start + 1)));
+	return (ftf_strsub(s, start, (end - start + 1)));
 }

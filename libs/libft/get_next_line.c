@@ -73,7 +73,7 @@ int					get_next_line(int const fd, char **line)
 		save[fd] = ft_strrejoin(ptr, buff, res);
 		free(ptr);
 	}
-	*line = ft_strsub(save[fd], 0, ft_strclen(save[fd]));
+	*line = ftf_strsub(save[fd], 0, ft_strclen(save[fd]));
 	if (ft_chrandcpy(save[fd]) == NULL)
 		return (0);
 	return (1);

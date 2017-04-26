@@ -30,7 +30,7 @@ char	**ft_strsplit(char const *s, char c)
 		while (s[i + len] && s[i + len] != c)
 			len++;
 		if (len)
-			tab[j++] = ft_strsub(s, i, len);
+			tab[j++] = ftf_strsub(s, i, len);
 		i += len ? len : 1;
 		len = 0;
 	}

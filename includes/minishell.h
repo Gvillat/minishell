@@ -16,7 +16,8 @@ struct 				s_env
 	char			*key;
 	void			*value;
 	size_t			size;
-	void			*next;
+	t_env			*next;
+	t_env			*prev;
 };
 
 typedef struct		s_builtins
