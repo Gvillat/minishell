@@ -32,5 +32,6 @@ void			ft_env(char **args);
 void			ft_setenv(char **args);
 void			ft_unsetenv(char **args);
 void			ft_setprompt(char **args);
+void			ft_echo(char **args);
 
 #endif

@@ -1,6 +1,5 @@
 #include "../includes/minishell.h"
 #include <stdio.h>
-// #include "../libs/libft/get_next_line.h"
 
 t_env *ft_new_env(char **name, t_env *lst)
 {
@@ -23,7 +22,6 @@ t_env *ft_new_env(char **name, t_env *lst)
 
 t_env *ft_add_env(char **tmp, t_env *lst)
 {
-	// ft_printf("%s=%s\n", tmp[0], tmp[1]);
 	if(!lst)
 		return (lst = ft_new_env(tmp, NULL));
 	while (lst->next)
@@ -57,6 +55,56 @@ char **ft_get_path(t_env **lst)
 	return (tt);
 }
 
+
+int finding_the_path(char **path, char **argv, t_env *lst, char **env)
+{
+	int i;
+	char *tmp;
+	pid_t father;
+
+	tmp = NULL;
+	i = 0;
+	while (path[i])
+	{
+		tmp = ft_strjoin(path[i], "/");
+		tmp = ft_strjoin(tmp, argv[0]);
+		if (access(tmp, F_OK) == 0)
+		{                                                                                                                                                                                                                                                                                                               
+			father = fork();
+			execve(tmp, argv, env);
+		}
+		i++;
+	}
+	return (0);
+}
+
+
+// int ft_builtins(char **path, char **argv, t_env *lst, char **env)
+// {
+// 	static	t_builtins	builtins[] = {
+// 								{"cd", ft_cd},
+// 								{"exit", ft_exit},
+// 								{"env", ft_env},
+// 								{"setenv", ft_setenv},
+// 								{"unsetenv", ft_unsetenv},
+// 								{"setprompt", ft_setprompt},
+// 								{"echo", ft_echo}};
+// 	int i;
+
+// 	i = 0;
+// 	while (i < 6)
+// 	{
+// 		if (ft_strequ(argv[0], builtins[i].name))
+// 		{
+// 			ft_printf("%s    %s \n", argv[0], builtins[i].name);
+// 			// builtins[i].func(argv + 1);
+// 			return (1);
+// 		}
+// 		i++;
+// 	}
+// 	return (0);
+// }
+
 int main(int argc, char *argv[], char *env[])
 {
 	int i;
@@ -76,13 +124,13 @@ int main(int argc, char *argv[], char *env[])
 			while (env[i])
 			{
 				lst = do_the_dope_walk(env[i], lst);
-				ft_printf("%s=%s\n",lst->key, lst->value );
 				i++;
 			}
-			i = 0;
 			path = ft_get_path(&lst);
-			while (path[++i])
-				ft_printf("%s\n", path[i]);
+			// ft_builtins(path, argv, lst, env);
+			finding_the_path(path, argv, lst, env);
+			// else
+			// 	build_built_built()
 		}
 	}
 	return(0);
