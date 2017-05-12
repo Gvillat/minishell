@@ -1,17 +1,32 @@
 #include "../includes/minishell.h"
 #include <stdio.h>
 
+int	g_process_running = 0;
+int g_running = 1;
+
+void	print_error(char *from, char *str1, char *str2)
+{
+	ft_putstr_fd(from, 2);
+	if (str1)
+		ft_putstr_fd(str1, 2);
+	if (str2)
+		ft_putendl_fd(str2, 2);
+}
+
+
 t_env *ft_new_env(char **name, t_env *lst)
 {
 	t_env *new;
 	size_t size;
 
-	if (!lst)
-		size = 0;
-	else
-		size = lst->size;
 	if (!(new = (t_env*)malloc(sizeof(t_env))))
 		return(NULL);
+	if (!lst)
+		size = -1;
+	else
+	{
+		size = lst->size;
+	}
 	new->key = name[0];
 	new->value = name[1];
 	new->size = size + 1;
@@ -29,109 +44,176 @@ t_env *ft_add_env(char **tmp, t_env *lst)
 	return (lst->next = ft_new_env(tmp, lst));
 }
 
-t_env *do_the_dope_walk(char *env, t_env *lst)
+t_env *ft_search_env(char *str, t_env *lst)
 {
-	char **tmp;
+	int i;
 
-	if (!env)
-		return (NULL);
-	tmp = ft_strsplit(env, '=');
-	lst = ft_add_env(tmp, lst);
+	i = 0;
+	if (!lst)
+		return(NULL);
+	else
+	{
+		
+	}
 	return (lst);
 }
 
-char **ft_get_path(t_env **lst)
+static void ft_add_lvl(t_env *lst)
 {
-	t_env *tmp;
-	char **tt;
-	int i;
+	int		i;
 
-	i = 0;
-	tt= NULL;
-	tmp = *lst;
-	while(tmp && ft_strcmp(tmp->key, "PATH"))
-		tmp = tmp->prev;
-	tt = ft_strsplit(tmp->value, ':');
-	return (tt);
+	while(!ft_strequ("SHLVL", lst->key))
+		lst = lst->prev;
+	i = ft_atoi(lst->value);
+	++i;
+	lst->value = ft_itoa(i);
+
 }
 
-
-int finding_the_path(char **path, char **argv, t_env *lst, char **env)
+t_env *do_the_dope_walk(char **env, t_env *lst)
 {
+	char **tmp;
 	int i;
-	char *tmp;
-	pid_t father;
-
-	tmp = NULL;
+	// char *prpt[2];
+	
+	// prpt[0] = "PROMPT";
+	// prpt[1] = "$>";
 	i = 0;
-	while (path[i])
+	lst = NULL;
+	while (env[i])
 	{
-		tmp = ft_strjoin(path[i], "/");
-		tmp = ft_strjoin(tmp, argv[0]);
-		if (access(tmp, F_OK) == 0)
-		{                                                                                                                                                                                                                                                                                                               
-			father = fork();
-			execve(tmp, argv, env);
-		}
+		tmp = ft_strsplit(env[i], '=');
+		lst = ft_add_env(tmp, lst);
 		i++;
+		free(tmp);
 	}
-	return (0);
+	// lst = ft_add_env(prpt, lst);
+	return (lst);
 }
 
+static void	sig_handler(int id)
+{
+	if (id == SIGINT)
+	{
+		ft_putchar('\n');
+		return ;
+	}
+}
 
-// int ft_builtins(char **path, char **argv, t_env *lst, char **env)
+char **build_env_tab(t_env *lst)
+{
+	int i;
+	int j;
+	char **tab;
+	char *tmp;
+
+	i = lst->size + 1;
+	while (lst && lst->prev)
+		lst = lst->prev;
+	j = 0;
+	if (!(tab = (char**)ft_memalloc(sizeof(char *) * i)))
+		return (NULL);
+	while (lst && j < i)
+	{
+		tmp = ft_strjoin(ft_strjoin(lst->key, "="), lst->value);
+		tab[j] = ft_strdup(tmp);
+		j++;
+		lst = lst->next;
+		free(tmp);
+	}
+	return(tab);
+}
+
+static void	run_cmd(char *cmd, t_env * lst)
+{
+	pid_t	father;
+	char	**tab;
+	char 	**bb;
+
+	if (!(bb = (char**)ft_memalloc(sizeof(char*) * 3)))
+		exit(0);
+	father = fork();
+	if (father)
+	{
+		g_process_running = 1;
+		wait(NULL);
+		g_process_running = 0;
+	}
+	else
+	{
+		execve(cmd, bb, (tab = build_env_tab(lst)));
+	}
+}
+
+char **parse_and_split(char **cmd)
+{
+	char *tmp;
+	char **tab;
+	int i;
+
+	i = -1;
+	if (!cmd)
+		return (NULL);
+	if ((tab = ft_strsplit(*cmd, ' ')))
+	{
+		while (tab[++i])
+		{
+			tab[i] = ft_strtrim(tab[i]);
+			ft_printf("%s\n", tab[i])
+		}
+	}
+
+
+
+	return (tab);
+}
+
+// void exec_cmd(char **cmd, t_env *env)
 // {
-// 	static	t_builtins	builtins[] = {
-// 								{"cd", ft_cd},
-// 								{"exit", ft_exit},
-// 								{"env", ft_env},
-// 								{"setenv", ft_setenv},
-// 								{"unsetenv", ft_unsetenv},
-// 								{"setprompt", ft_setprompt},
-// 								{"echo", ft_echo}};
-// 	int i;
+// 	char **tab;
 
-// 	i = 0;
-// 	while (i < 6)
-// 	{
-// 		if (ft_strequ(argv[0], builtins[i].name))
-// 		{
-// 			ft_printf("%s    %s \n", argv[0], builtins[i].name);
-// 			// builtins[i].func(argv + 1);
-// 			return (1);
-// 		}
-// 		i++;
-// 	}
-// 	return (0);
+// 	tab = parse_and_split(cmd);
+
+// }
+
+// int run_file(char *cmd, t_env *lst)
+// {
+// 	if (cmd[0] != '.' && cmd[0] != '/')
+// 		return (0);
+// 	if (access(cmd, F_OK) == -1)
+// 		print_error("minishell: ", "no such file or directory: ", cmd);
+// 	else if (access(cmd, X_OK) == -1)
+// 		print_error("minishell: ", "permission denied: ", cmd);
+// 	else
+// 		run_cmd(cmd, lst);
+	// return (1);
 // }
 
 int main(int argc, char *argv[], char *env[])
 {
-	int i;
 	t_env *lst;
-	char **path;
+	char *cmd;
+	char **tab;
+	int i;
 
-	lst = NULL;
-	i = 0;
-	if (!env)
-		exit(0);
-	else
-	{
-		while (42)
-		{	
-			ft_putstr("$>");
-			get_next_line(1, argv);
-			while (env[i])
-			{
-				lst = do_the_dope_walk(env[i], lst);
-				i++;
-			}
-			path = ft_get_path(&lst);
-			// ft_builtins(path, argv, lst, env);
-			finding_the_path(path, argv, lst, env);
-			// else
-			// 	build_built_built()
-		}
+	lst = do_the_dope_walk(env, lst);
+	ft_add_lvl(lst);
+	// signal(SIGINT, sig_handler);	
+	while (g_running)
+	{	
+		ft_putstr("$>");
+		get_next_line(0, &cmd);
+		// exec_cmd(&cmd, lst);
+		tab = parse_and_split(&cmd);
+		//parser cmd en un tableau
+		// 1 parser le ; 
+		// 2 parser les opt du 1
+		// run_file(cmd, lst);
+		// if (!run_file(cmd, lst) && !run_builtins(cmd, lst))
+		// 	run_path(cmd, lst);
+		// run_cmd(cmd, lst);
+		// 	ft_printf("%s=%s %d\n", lst->key, lst->value, lst->size);
+		ft_memdel((void **)&cmd);
 	}
 	return(0);
 }
