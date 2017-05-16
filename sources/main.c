@@ -1,8 +1,8 @@
 #include "../includes/minishell.h"
 #include <stdio.h>
 
-int	g_process_running = 0;
 int g_running = 1;
+
 
 void	print_error(char *from, char *str1, char *str2)
 {
@@ -14,7 +14,7 @@ void	print_error(char *from, char *str1, char *str2)
 }
 
 
-t_env *ft_new_env(char **name, t_env *lst)
+t_env *lst_new_env(char **name, t_env *lst)
 {
 	t_env *new;
 	size_t size;
@@ -35,60 +35,69 @@ t_env *ft_new_env(char **name, t_env *lst)
 	return (new);
 }
 
-t_env *ft_add_env(char **tmp, t_env *lst)
+t_env *lst_add_env(char **tmp, t_env *lst)
 {
+	t_env *tt;
+
 	if(!lst)
-		return (lst = ft_new_env(tmp, NULL));
-	while (lst->next)
-		lst = lst->next;
-	return (lst->next = ft_new_env(tmp, lst));
-}
-
-t_env *ft_search_env(char *str, t_env *lst)
-{
-	int i;
-
-	i = 0;
-	if (!lst)
-		return(NULL);
-	else
-	{
-		
-	}
+		return (lst = lst_new_env(tmp, NULL));
+	tt = lst;
+	while (tt->next)
+		tt = tt->next;
+	tt->next = lst_new_env(tmp, tt);
 	return (lst);
 }
 
-static void ft_add_lvl(t_env *lst)
+t_env *lst_search_env(char *name, t_env *lst)
 {
+	t_env *tmp;
+
+	if (!name || !lst)
+		return (NULL);
+	tmp = lst;
+	while (tmp)
+	{
+		if (ft_strequ(name, tmp->key))
+		{
+			return(tmp);
+		}
+		tmp = tmp->next;
+	}
+	return (tmp);
+}
+
+t_env *lst_add_lvl(t_env *lst)
+{
+	t_env *tmp;
 	int		i;
 
-	while(!ft_strequ("SHLVL", lst->key))
-		lst = lst->prev;
-	i = ft_atoi(lst->value);
+	tmp = lst;
+	tmp = lst_search_env("SHLVL", tmp);
+	i = ft_atoi(tmp->value);
 	++i;
-	lst->value = ft_itoa(i);
-
+	tmp->value = ft_itoa(i);
+	return (lst);
 }
 
 t_env *do_the_dope_walk(char **env, t_env *lst)
 {
 	char **tmp;
 	int i;
-	// char *prpt[2];
+	char *prpt[2];
 	
-	// prpt[0] = "PROMPT";
-	// prpt[1] = "$>";
+	prpt[0] = "PROMPT";
+	prpt[1] = "$>";
 	i = 0;
 	lst = NULL;
 	while (env[i])
 	{
 		tmp = ft_strsplit(env[i], '=');
-		lst = ft_add_env(tmp, lst);
+		lst = lst_add_env(tmp, lst);
 		i++;
 		free(tmp);
 	}
-	// lst = ft_add_env(prpt, lst);
-	return (lst);
+	lst_add_env(prpt, lst);
+	return (lst_add_lvl(lst));
 }
 
 static void	sig_handler(int id)
@@ -108,8 +117,8 @@ char **build_env_tab(t_env *lst)
 	char *tmp;
 
 	i = lst->size + 1;
-	while (lst && lst->prev)
-		lst = lst->prev;
+	// while (lst && lst->prev)
+		// lst = lst->prev;
 	j = 0;
 	if (!(tab = (char**)ft_memalloc(sizeof(char *) * i)))
 		return (NULL);
@@ -124,87 +133,102 @@ char **build_env_tab(t_env *lst)
 	return(tab);
 }
 
-static void	run_cmd(char *cmd, t_env * lst)
+static void	run_cmd(char **cmd, t_env * lst)
 {
 	pid_t	father;
 	char	**tab;
-	char 	**bb;
 
-	if (!(bb = (char**)ft_memalloc(sizeof(char*) * 3)))
-		exit(0);
 	father = fork();
 	if (father)
-	{
-		g_process_running = 1;
 		wait(NULL);
-		g_process_running = 0;
-	}
 	else
-	{
-		execve(cmd, bb, (tab = build_env_tab(lst)));
-	}
+		execve(cmd[0], cmd, (tab = build_env_tab(lst)));
 }
 
-char **parse_and_split(char **cmd)
+int run_builtins(char **cmd, t_env *lst)
 {
-	char *tmp;
-	char **tab;
+	static	t_builtins	builtins[] = {
+							{"cd", ft_cd},
+							{"exit", ft_exit},
+							{"env", ft_env},
+							{"setenv", ft_setenv},
+							{"unsetenv", ft_unsetenv},
+							{"setprompt", ft_setprompt},
+							{"echo", ft_echo}};
 	int i;
 
-	i = -1;
+	i = 0;
+	while (i < 7)
+	{
+		if (!ft_strcmp(cmd[0], builtins[i].name))
+		{
+			// ft_printf("%s    %s \n", cmd[0], builtins[i].name);
+			builtins[i].func(&cmd[0], lst);
+			return (1);
+		}
+		i++;
+	}
+	return (0);
+}
+
+int run_file(char **cmd, t_env *lst)
+{
+	if (cmd[0][0] != '.' && cmd[0][0] != '/')
+		return (0);
+	if (access(*cmd, F_OK) == -1)
+		print_error("minishell: ", "no such file or directory: ", cmd[0]);
+	if (access(*cmd, X_OK) == -1)
+		print_error("minishell: ", "permission denied: ", cmd[0]);
+	else
+		run_cmd(cmd, lst);
+	return (1);
+}
+
+char **parse_and_split(char **cmd, t_env *lst)
+{
+	char **tab;
+	char **tmp;
+	int i;
+
+	i = 0;
 	if (!cmd)
 		return (NULL);
-	if ((tab = ft_strsplit(*cmd, ' ')))
+	if ((tab = ft_strsplit(*cmd, ';')))
 	{
-		while (tab[++i])
+		while (tab && tab[i] && g_running)
 		{
-			tab[i] = ft_strtrim(tab[i]);
-			ft_printf("%s\n", tab[i])
+			tmp = ft_strsplit(tab[i], ' ');
+			if (!(run_file(tmp, lst)) && !(run_builtins(tmp, lst)))
+				run_cmd(tmp, lst);
+			i++;
 		}
 	}
-
-
-
 	return (tab);
 }
 
-// void exec_cmd(char **cmd, t_env *env)
-// {
-// 	char **tab;
-
-// 	tab = parse_and_split(cmd);
-
-// }
-
-// int run_file(char *cmd, t_env *lst)
-// {
-// 	if (cmd[0] != '.' && cmd[0] != '/')
-// 		return (0);
-// 	if (access(cmd, F_OK) == -1)
-// 		print_error("minishell: ", "no such file or directory: ", cmd);
-// 	else if (access(cmd, X_OK) == -1)
-// 		print_error("minishell: ", "permission denied: ", cmd);
-// 	else
-// 		run_cmd(cmd, lst);
-	// return (1);
-// }
-
-int main(int argc, char *argv[], char *env[])
+void print_prompt(t_env *lst)
 {
-	t_env *lst;
-	char *cmd;
-	char **tab;
-	int i;
+	t_env *tmp;
 
-	lst = do_the_dope_walk(env, lst);
-	ft_add_lvl(lst);
-	// signal(SIGINT, sig_handler);	
+	if (!lst)
+		g_running = 0;
+	if ((tmp = lst_search_env("PROMPT", lst)))
+		ft_putstr(tmp->value);
+	else
+		ft_putstr("<3");
+}
+
+void ft_start(t_env *lst)
+{
+	char *cmd;
+
 	while (g_running)
 	{	
-		ft_putstr("$>");
+		// print_prompt(lst);
+		ft_putstr("$>"); // print prompt
 		get_next_line(0, &cmd);
 		// exec_cmd(&cmd, lst);
-		tab = parse_and_split(&cmd);
+		parse_and_split(&cmd, lst);
 		//parser cmd en un tableau
 		// 1 parser le ; 
 		// 2 parser les opt du 1
@@ -215,5 +239,17 @@ int main(int argc, char *argv[], char *env[])
 		// 	ft_printf("%s=%s %d\n", lst->key, lst->value, lst->size);
 		ft_memdel((void **)&cmd);
 	}
+}
+
+
+int main(int argc, char *argv[], char *env[])
+{
+	t_env *lst;
+
+
+	lst = do_the_dope_walk(env, lst);
+	ft_start(lst);
+	signal(SIGINT, sig_handler);	
+	// ft_end(lst);
 	return(0);
 }
