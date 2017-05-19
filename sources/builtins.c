@@ -1,21 +1,6 @@
 #include "../includes/minishell.h"
 #include <stdio.h>
 
-t_env *ft_cd(char **args, t_env *lst)
-{
-	int i;
-
-	// if (!args[0])
-		// return (go_to(hash_getset(&g_env, "HOME", "/", 2)->value));
-	i = 0;
-	while (args[i])
-	{
-// 		go_to(args[i]);
-		++i;
-	}
-	return (lst);
-}
-
 t_env *ft_exit(char **args, t_env *lst)
 {
 	g_running = 0;
@@ -78,28 +63,4 @@ t_env *ft_echo(char **args, t_env *lst)
 	}
 	ft_putchar('\n');
 	return (lst);
-}
-
-
-int finding_path(char **path, char **cmd, t_env **lst)
-{
-	int i;
-	char *tmp;
-
-	tmp = NULL;
-	i = 0;
-	while (path[i])
-	{
-		tmp = ft_strjoin(ft_strjoin(path[i], "/"), cmd[0]);
-		if (access(tmp, F_OK) == 0)
-		{	
-			cmd[0] = ft_strsub(tmp, 0, ft_strlen(tmp) + 1);
-			run_cmd(cmd, lst);
-			free(tmp);
-			return (1);
-		}
-		free(tmp);
-		i++;
-	}
-	return (0);
 }
