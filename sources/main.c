@@ -1,7 +1,12 @@
 #include "../includes/minishell.h"
-#include <stdio.h>
 
 int g_running = 1;
+
+t_env *ft_exit(char **args, t_env *lst)
+{
+	g_running = 0;
+	return(lst);
+}
 
 void	print_error(char *from, char *str1, char *str2)
 {
@@ -12,7 +17,7 @@ void	print_error(char *from, char *str1, char *str2)
 		ft_putendl_fd(str2, 2);
 }
 
-static void print_prompt(t_env *lst)
+void print_prompt(t_env *lst)
 {
 	t_env *tmp;
 
@@ -37,9 +42,9 @@ int main(int argc, char *argv[], char *env[])
 {
 	t_env *lst;
 	char *cmd;
-	char **tab;
 
 	lst = build_lst_env(env, lst);
+	signal(SIGINT, sig_handler);
 	while (g_running)
 	{	
 		print_prompt(lst);
@@ -47,8 +52,6 @@ int main(int argc, char *argv[], char *env[])
 		parse_and_exec(&cmd, &lst);
 		ft_memdel((void **)&cmd);
 	}
-	(void)argc;
-	(void)argv;
-	free_lst(&lst);
+	free_lst(lst);
 	return(0);
 }

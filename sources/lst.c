@@ -23,7 +23,7 @@ t_env *lst_del_env(char *name, t_env *lst)
 	return (lst);
 }
 
-t_env *lst_new_env(char **name, t_env *lst)
+static t_env *lst_new_env(char **name, t_env *lst)
 {
 	t_env *new;
 	size_t size;

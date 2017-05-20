@@ -1,11 +1,4 @@
 #include "../includes/minishell.h"
-#include <stdio.h>
-
-t_env *ft_exit(char **args, t_env *lst)
-{
-	g_running = 0;
-	return (free_lst(&lst));
-}
 
 t_env *ft_env(char **args, t_env *lst)
 {
