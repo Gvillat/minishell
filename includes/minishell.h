@@ -5,9 +5,9 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <stdlib.h>
-# include "../libs/libft/libft.h"
-# include "../libs/libft/get_next_line.h"
-# include "../libs/printf/includes/ft_printf.h"
+# include "libft.h"
+# include "get_next_line.h"
+# include "fpf_printf.h"
 # include <sys/stat.h>
 
 int g_running;

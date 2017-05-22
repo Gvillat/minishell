@@ -8,7 +8,7 @@ t_env *ft_env(char **args, t_env *lst)
 	tmp  = lst;
 	while (tmp)
 	{
-		ft_printf("%s=%s %d\n", tmp->key, tmp->value, tmp->size);
+		fpf_printf("%s=%s %d\n", tmp->key, tmp->value, tmp->size);
 		tmp = tmp->next;
 	}
 	return (lst);
@@ -51,7 +51,7 @@ t_env *ft_echo(char **args, t_env *lst)
 	i = 1;
 	while (args[i])
 	{	
-		ft_printf("%s ", args[i]);
+		fpf_printf("%s ", args[i]);
 		i++;
 	}
 	ft_putchar('\n');

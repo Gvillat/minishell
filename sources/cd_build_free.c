@@ -95,10 +95,10 @@ void free_lst(t_env *lst)
 {
 	t_env *curr;
 
-	while (*lst)
+	while (lst)
 	{
-		curr = *lst;
+		curr = lst;
 		free(curr);
-		*lst = (*lst)->next;
+		lst = lst->next;
 	}
 }
