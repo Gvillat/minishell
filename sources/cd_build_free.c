@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   cd_build_free.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/22 15:54:47 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 15:54:49 by gvillat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
-static void	go_to(char *path, t_env *lst)
+static void		go_to(char *path, t_env *lst)
 {
-	static struct stat st;
-	char *str;
+	static struct stat	st;
+	char				*str;
 
 	if (access(path, F_OK) == -1)
 		return (print_error("cd: ", "no such file or directory: ", path));
@@ -21,10 +33,10 @@ static void	go_to(char *path, t_env *lst)
 	lst->value = str;
 }
 
-t_env	*ft_cd(char **args, t_env *lst)
+t_env			*ft_cd(char **args, t_env *lst)
 {
-	int i;
-	char buf[4096];
+	int		i;
+	char	buf[4096];
 
 	ft_memset(buf, 0, 4096);
 	if (ft_strequ(args[0], "cd") && !args[1])
@@ -45,15 +57,15 @@ t_env	*ft_cd(char **args, t_env *lst)
 		else
 			go_to(args[i], lst);
 	}
-	return(lst);
+	return (lst);
 }
 
-t_env *build_lst_env(char **env, t_env *lst)
+t_env			*build_lst_env(char **env, t_env *lst)
 {
-	char **tmp;
-	int i;
-	char *prpt[2];
-	
+	char	**tmp;
+	int		i;
+	char	*prpt[2];
+
 	prpt[0] = "PROMPT";
 	prpt[1] = "$>";
 	i = 0;
@@ -69,12 +81,12 @@ t_env *build_lst_env(char **env, t_env *lst)
 	return (lst_add_lvl(lst));
 }
 
-char **build_env_tab(t_env *lst)
+char			**build_env_tab(t_env *lst)
 {
-	int i;
-	int j;
-	char **tab;
-	char *tmp;
+	int		i;
+	int		j;
+	char	**tab;
+	char	*tmp;
 
 	i = lst->size + 1;
 	j = 0;
@@ -88,10 +100,10 @@ char **build_env_tab(t_env *lst)
 		lst = lst->next;
 		free(tmp);
 	}
-	return(tab);
+	return (tab);
 }
 
-void free_lst(t_env *lst)
+void			free_lst(t_env *lst)
 {
 	t_env *curr;
 

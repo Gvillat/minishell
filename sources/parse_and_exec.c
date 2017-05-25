@@ -1,18 +1,32 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_and_exec.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/22 15:55:24 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 15:55:25 by gvillat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
-static t_env *climb_the_ladder(t_env *lst)
+static t_env	*climb_the_ladder(t_env *lst)
 {
 	while (lst->prev)
 		lst = lst->prev;
 	return (lst);
 }
 
-char **parse_and_exec(char **cmd, t_env **lst)
+char			**parse_and_exec(char **cmd, t_env **lst)
 {
-	char **tab;
-	char **tmp;
-	int i;
+	char	**tab;
+	char	**tmp;
+	int		i;
 
+	tmp = NULL;
+	tab = NULL;
 	i = 0;
 	if (!cmd)
 		return (NULL);
@@ -28,5 +42,6 @@ char **parse_and_exec(char **cmd, t_env **lst)
 	}
 	if ((*lst)->prev)
 		*lst = climb_the_ladder(*lst);
+	free(tmp);
 	return (tab);
 }

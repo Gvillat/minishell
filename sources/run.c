@@ -1,9 +1,21 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   run.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/22 15:55:32 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 15:55:33 by gvillat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
-static int finding_path(char **path, char **cmd, t_env **lst)
+static int	finding_path(char **path, char **cmd, t_env **lst)
 {
-	int i;
-	char *tmp;
+	int		i;
+	char	*tmp;
 
 	tmp = NULL;
 	i = 0;
@@ -11,7 +23,7 @@ static int finding_path(char **path, char **cmd, t_env **lst)
 	{
 		tmp = ft_strjoin(ft_strjoin(path[i], "/"), cmd[0]);
 		if (access(tmp, F_OK) == 0)
-		{	
+		{
 			cmd[0] = ft_strsub(tmp, 0, ft_strlen(tmp) + 1);
 			run_cmd(cmd, lst);
 			free(tmp);
@@ -23,10 +35,10 @@ static int finding_path(char **path, char **cmd, t_env **lst)
 	return (0);
 }
 
-void run_path(char **cmd, t_env **lst)
+void		run_path(char **cmd, t_env **lst)
 {
-	t_env *curr;
-	char **path;
+	t_env	*curr;
+	char	**path;
 
 	curr = lst_search_env("PATH", *lst);
 	path = ft_strsplit(curr->value, ':');
@@ -34,19 +46,21 @@ void run_path(char **cmd, t_env **lst)
 	free(path);
 }
 
-void	run_cmd(char **cmd, t_env **lst)
+void		run_cmd(char **cmd, t_env **lst)
 {
 	pid_t	father;
 	char	**tab;
 
+	tab = NULL;
 	father = fork();
 	if (father)
 		wait(NULL);
 	else
 		execve(cmd[0], cmd, (tab = build_env_tab(*lst)));
+	free(tab);
 }
 
-int run_builtins(char **cmd, t_env **lst)
+int			run_builtins(char **cmd, t_env **lst)
 {
 	static	t_builtins	builtins[] = {
 							{"cd", ft_cd},
@@ -55,7 +69,7 @@ int run_builtins(char **cmd, t_env **lst)
 							{"setenv", ft_setenv},
 							{"unsetenv", ft_unsetenv},
 							{"echo", ft_echo}};
-	int i;
+	int					i;
 
 	i = 0;
 	while (i < 6)
@@ -70,7 +84,7 @@ int run_builtins(char **cmd, t_env **lst)
 	return (0);
 }
 
-int run_file(char **cmd, t_env **lst)
+int			run_file(char **cmd, t_env **lst)
 {
 	if (cmd[0][0] != '.' && cmd[0][0] != '/')
 		return (0);

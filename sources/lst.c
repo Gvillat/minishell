@@ -1,12 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   lst.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/22 15:55:00 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 15:55:02 by gvillat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
-t_env *lst_del_env(char *name, t_env *lst)
+t_env			*lst_del_env(char *name, t_env *lst)
 {
 	t_env *tmp;
 
 	tmp = NULL;
 	if (!(lst = lst_search_env(name, lst)))
-		print_error("unsetenv: variable introuvable", "", "");
+		print_error("lst_search_env: variable introuvable", "", "");
 	else
 	{
 		if (lst->prev)
@@ -23,13 +35,13 @@ t_env *lst_del_env(char *name, t_env *lst)
 	return (lst);
 }
 
-static t_env *lst_new_env(char **name, t_env *lst)
+static t_env	*lst_new_env(char **name, t_env *lst)
 {
-	t_env *new;
-	size_t size;
+	t_env	*new;
+	size_t	size;
 
 	if (!(new = (t_env*)malloc(sizeof(t_env))))
-		return(NULL);
+		return (NULL);
 	if (!lst)
 		size = -1;
 	else
@@ -44,11 +56,11 @@ static t_env *lst_new_env(char **name, t_env *lst)
 	return (new);
 }
 
-t_env *lst_add_env(char **tmp, t_env *lst)
+t_env			*lst_add_env(char **tmp, t_env *lst)
 {
 	t_env *tt;
 
-	if(!lst)
+	if (!lst)
 		return (lst = lst_new_env(tmp, NULL));
 	tt = lst;
 	while (tt->next)
@@ -57,7 +69,7 @@ t_env *lst_add_env(char **tmp, t_env *lst)
 	return (lst);
 }
 
-t_env *lst_search_env(char *name, t_env *lst)
+t_env			*lst_search_env(char *name, t_env *lst)
 {
 	t_env *tmp;
 
@@ -68,16 +80,16 @@ t_env *lst_search_env(char *name, t_env *lst)
 	{
 		if (ft_strequ(name, tmp->key))
 		{
-			return(tmp);
+			return (tmp);
 		}
 		tmp = tmp->next;
 	}
 	return (tmp);
 }
 
-t_env *lst_add_lvl(t_env *lst)
+t_env			*lst_add_lvl(t_env *lst)
 {
-	t_env *tmp;
+	t_env	*tmp;
 	int		i;
 
 	tmp = lst;

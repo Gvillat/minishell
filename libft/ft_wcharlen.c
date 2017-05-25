@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/fpf_printf.h"
+#include "../includes/libft.h"
+#include "../includes/fpf_printf.h"
 
 int			ft_wcharlen(wchar_t wchar)
 {

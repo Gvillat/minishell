@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/fpf_printf.h"
+#include "../includes/libft.h"
 
 void	*ft_strlower(char *s)
 {

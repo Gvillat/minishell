@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: gvillat <marvin@42.fr>                     +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2017/05/22 15:53:57 by gvillat           #+#    #+#              #
+#    Updated: 2017/05/22 15:53:59 by gvillat          ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 .PHONY: all re clean fclean norme
 
 NAME = minishell
@@ -17,13 +29,12 @@ OBJ =	$(SRC:.c=.o)
 
 all: $(NAME)
 
-$(NAME):
+$(NAME): $(OBJ)
 	@make -C ./libft
 	@$(CC) $(FLAGS) -o $(NAME) $(SRC) libft/libft.a
-	@ranlib $(NAME)
 
 clean:
-	rm -rf *.o
+	rm -rf sources/*.o
 
 fclean: clean
 	rm -f $(NAME)

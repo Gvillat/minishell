@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fpf_printf.h                                        :+:      :+:    :+:   */
+/*   fpf_printf.h                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2016/09/27 17:36:12 by gvillat           #+#    #+#             */
-/*   Updated: 2016/09/27 17:36:13 by gvillat          ###   ########.fr       */
+/*   Created: 2017/05/22 16:05:57 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 16:06:13 by gvillat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,8 @@
 # define BUFF_MAX 58
 # define FD 1
 # include <stdarg.h>
-# include <unistd.h>
-# include <stdlib.h>
 # include <wchar.h>
+# include "libft.h"
 
 char	g_buff[BUFF_MAX];
 int		g_i;
@@ -78,27 +77,7 @@ void	fpf_init_spe_tab(SPE *spe);
 ** LIBPRINTF
 */
 
-char	*ft_strnew(size_t size);
-int		ft_tolower(int c);
-int		ft_wcharlen(wchar_t wchar);
-size_t	ft_wbytelen(wchar_t *ws);
-void	*ft_strlower(char *s);
-int		ft_atoi(const char *nbr);
-char	*ft_itoa_base(uintmax_t nbr, int base);
-int		ft_wchartostr(char *s, wchar_t wc);
 void	fpf_nputchar(char c, ssize_t n, PF *argument);
-size_t	ft_strlen(const char *s);
-size_t	ft_wstrlen(wchar_t *s);
-int		ft_wstrtostr(char *s, wchar_t *wstr, int n);
-char	*ft_strsub(char const *s, unsigned int start, size_t len);
-char	*ft_wstrsub(wchar_t *ws, unsigned int start, size_t len);
-char	*ft_strsub_with_free(char const *s, unsigned int start, size_t len);
-char	*ft_transform_wchar_in_char(wchar_t *ws);
-int		ft_putwchar_in_char(wchar_t wchar, char *fresh, int i);
-int		ft_strcmp(const char *s1, const char *s2);
-void	*ft_memset(void *dest, int c, size_t n);
-int		ft_isescaped(char c);
-int		ft_isdigit(int c);
 
 /*
 ** HANDLER

@@ -1,17 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fpf_strsub.c                                        :+:      :+:    :+:   */
+/*   ft_strsub.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/03 19:55:50 by gvillat           #+#    #+#             */
-/*   Updated: 2015/12/16 21:53:02 by gvillat          ###   ########.fr       */
+/*   Created: 2017/05/22 16:11:07 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 16:11:09 by gvillat          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
-#include "../../includes/fpf_printf.h"
+#include "../includes/libft.h"
+#include "../includes/fpf_printf.h"
 
 char		*ft_strsub(char const *s, unsigned int start, size_t len)
 {

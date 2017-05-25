@@ -13,6 +13,7 @@
 #ifndef LIBFT_H
 # define LIBFT_H
 
+# include "fpf_printf.h"
 # include <string.h>
 # include <unistd.h>
 # include <stdlib.h>
@@ -90,4 +91,22 @@ void				ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 t_list				*ft_lstmap(t_list *lst, t_list *(*f)(t_list *elem));
 t_list				*ft_lstnew(void const *content, size_t content_size);
 void				ft_lstpush(t_list *list, t_list *new);
+
+/*
+** LIBPRINTF
+*/
+
+int					ft_wcharlen(wchar_t wchar);
+size_t				ft_wbytelen(wchar_t *ws);
+void				*ft_strlower(char *s);
+char				*ft_itoa_base(uintmax_t nbr, int base);
+int					ft_wchartostr(char *s, wchar_t wc);
+size_t				ft_wstrlen(wchar_t *s);
+int					ft_wstrtostr(char *s, wchar_t *wstr, int n);
+char				*ft_wstrsub(wchar_t *ws, unsigned int start, size_t len);
+char				*ft_strsub_with_free(char const *s, unsigned int start,
+					size_t len);
+char				*ft_transform_wchar_in_char(wchar_t *ws);
+int					ft_putwchar_in_char(wchar_t wchar, char *fresh, int i);
+
 #endif

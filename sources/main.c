@@ -1,14 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2017/05/22 15:55:13 by gvillat           #+#    #+#             */
+/*   Updated: 2017/05/22 15:55:15 by gvillat          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../includes/minishell.h"
 
 int g_running = 1;
 
-t_env *ft_exit(char **args, t_env *lst)
+t_env			*ft_exit(char **args, t_env *lst)
 {
 	g_running = 0;
-	return(lst);
+	(void)args;
+	return (lst);
 }
 
-void	print_error(char *from, char *str1, char *str2)
+void			print_error(char *from, char *str1, char *str2)
 {
 	ft_putstr_fd(from, 2);
 	if (str1)
@@ -17,7 +30,7 @@ void	print_error(char *from, char *str1, char *str2)
 		ft_putendl_fd(str2, 2);
 }
 
-void print_prompt(t_env *lst)
+void			print_prompt(t_env *lst)
 {
 	t_env *tmp;
 
@@ -29,7 +42,7 @@ void print_prompt(t_env *lst)
 		ft_putstr("<3");
 }
 
-static void	sig_handler(int id)
+static void		sig_handler(int id)
 {
 	if (id == SIGINT)
 	{
@@ -38,20 +51,25 @@ static void	sig_handler(int id)
 	}
 }
 
-int main(int argc, char *argv[], char *env[])
+int				main(int argc, char *argv[], char *env[])
 {
-	t_env *lst;
-	char *cmd;
+	t_env	*lst;
+	char	*cmd;
 
+	lst = NULL;
+	cmd = NULL;
 	lst = build_lst_env(env, lst);
 	signal(SIGINT, sig_handler);
 	while (g_running)
-	{	
+	{
 		print_prompt(lst);
 		get_next_line(0, &cmd);
 		parse_and_exec(&cmd, &lst);
 		ft_memdel((void **)&cmd);
 	}
+	free(cmd);
 	free_lst(lst);
-	return(0);
+	(void)argc;
+	(void)argv;
+	return (0);
 }
