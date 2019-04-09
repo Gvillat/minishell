@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   run.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: guvillat <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/22 15:55:32 by gvillat           #+#    #+#             */
-/*   Updated: 2017/05/22 15:55:33 by gvillat          ###   ########.fr       */
+/*   Created: 2019/04/01 13:07:21 by guvillat          #+#    #+#             */
+/*   Updated: 2019/04/01 13:07:22 by guvillat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,21 +15,23 @@
 static int	finding_path(char **path, char **cmd, t_env **lst)
 {
 	int		i;
-	char	*tmp;
+	char	*tmp[2];
 
-	tmp = NULL;
+	tmp[0] = NULL;
+	tmp[1] = NULL;
 	i = 0;
 	while (path[i])
 	{
-		tmp = ft_strjoin(ft_strjoin(path[i], "/"), cmd[0]);
-		if (access(tmp, F_OK) == 0)
+		tmp[0] = ft_strjoin(path[i], "/");
+		tmp[1] = ft_strjoin(tmp[0], cmd[0]);
+		free(tmp[0]);
+		if (access(tmp[1], F_OK) == 0)
 		{
-			cmd[0] = ft_strsub(tmp, 0, ft_strlen(tmp) + 1);
-			run_cmd(cmd, lst);
-			free(tmp);
+			cmd[0] = ft_strsub(tmp[1], 0, ft_strlen(tmp[1]) + 1);
+			run_cmd(&cmd[0], lst);
 			return (1);
 		}
-		free(tmp);
+		free(tmp[1]);
 		i++;
 	}
 	return (0);
@@ -40,24 +42,32 @@ void		run_path(char **cmd, t_env **lst)
 	t_env	*curr;
 	char	**path;
 
-	curr = lst_search_env("PATH", *lst);
-	path = ft_strsplit(curr->value, ':');
-	finding_path(path, cmd, lst);
-	free(path);
+	curr = NULL;
+	if ((curr = lst_search_env("PATH", *lst)) && curr)
+	{
+		path = ft_strsplit(curr->value, ':');
+		finding_path(path, cmd, lst);
+		free(path);
+	}
 }
 
-void		run_cmd(char **cmd, t_env **lst)
+int			run_cmd(char **cmd, t_env **lst)
 {
 	pid_t	father;
 	char	**tab;
+	int		status;
 
 	tab = NULL;
 	father = fork();
 	if (father)
-		wait(NULL);
+		waitpid(father, &status, 0);
 	else
-		execve(cmd[0], cmd, (tab = build_env_tab(*lst)));
-	free(tab);
+	{
+		tab = build_env_tab(*lst);
+		execve(cmd[0], cmd, tab);
+		free(tab);
+	}
+	return (0);
 }
 
 int			run_builtins(char **cmd, t_env **lst)

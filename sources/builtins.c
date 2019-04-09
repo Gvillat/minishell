@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: guvillat <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/22 15:54:35 by gvillat           #+#    #+#             */
-/*   Updated: 2017/05/22 15:54:41 by gvillat          ###   ########.fr       */
+/*   Created: 2019/04/01 13:06:41 by guvillat          #+#    #+#             */
+/*   Updated: 2019/04/01 13:06:49 by guvillat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_env	*ft_env(char **args, t_env *lst)
 	tmp = lst;
 	while (tmp)
 	{
-		fpf_printf("%s=%s\n", tmp->key, tmp->value);
+		ft_printf("%s=%s\n", tmp->key, tmp->value);
 		tmp = tmp->next;
 	}
 	return (lst);
@@ -65,7 +65,7 @@ t_env	*ft_echo(char **args, t_env *lst)
 	i = 1;
 	while (args[i])
 	{
-		fpf_printf("%s ", args[i]);
+		ft_printf("%s ", args[i]);
 		i++;
 	}
 	ft_putchar('\n');

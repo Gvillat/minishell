@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: guvillat <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/22 15:54:25 by gvillat           #+#    #+#             */
-/*   Updated: 2017/05/22 15:54:30 by gvillat          ###   ########.fr       */
+/*   Created: 2019/04/01 13:11:29 by guvillat          #+#    #+#             */
+/*   Updated: 2019/04/01 13:11:43 by guvillat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,10 @@
 # include <signal.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <errno.h>
 # include <stdlib.h>
-# include "libft.h"
-# include "get_next_line.h"
-# include "fpf_printf.h"
+# include "../lib/includes/libft.h"
+# include "../lib/includes/ft_printf.h"
 # include <sys/stat.h>
 
 int g_running;
@@ -56,7 +56,7 @@ t_env				*lst_add_lvl(t_env *lst);
 char				**parse_and_exec(char **cmd, t_env **lst);
 void				print_error(char *from, char *str1, char *str2);
 void				run_path(char **cmd, t_env **lst);
-void				run_cmd(char **cmd, t_env **lst);
+int					run_cmd(char **cmd, t_env **lst);
 int					run_builtins(char **cmd, t_env **lst);
 int					run_file(char **cmd, t_env **lst);
 

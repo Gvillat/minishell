@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: guvillat <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/22 15:55:13 by gvillat           #+#    #+#             */
-/*   Updated: 2017/05/22 15:55:15 by gvillat          ###   ########.fr       */
+/*   Created: 2019/04/01 13:07:56 by guvillat          #+#    #+#             */
+/*   Updated: 2019/04/01 13:07:58 by guvillat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ static void		sig_handler(int id)
 {
 	if (id == SIGINT)
 	{
+		// g_running = 0;
 		ft_putchar('\n');
 		return ;
 	}
@@ -58,7 +59,9 @@ int				main(int argc, char *argv[], char *env[])
 
 	lst = NULL;
 	cmd = NULL;
-	lst = build_lst_env(env, lst);
+	if (!(lst = build_lst_env(env, lst)))
+		return (0);
+	lst_add_lvl(lst);
 	signal(SIGINT, sig_handler);
 	while (g_running)
 	{
@@ -67,8 +70,6 @@ int				main(int argc, char *argv[], char *env[])
 		parse_and_exec(&cmd, &lst);
 		ft_memdel((void **)&cmd);
 	}
-	free(cmd);
-	free_lst(lst);
 	(void)argc;
 	(void)argv;
 	return (0);

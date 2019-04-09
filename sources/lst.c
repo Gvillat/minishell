@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lst.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gvillat <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: guvillat <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2017/05/22 15:55:00 by gvillat           #+#    #+#             */
-/*   Updated: 2017/05/22 15:55:02 by gvillat          ###   ########.fr       */
+/*   Created: 2019/04/01 13:07:09 by guvillat          #+#    #+#             */
+/*   Updated: 2019/04/01 13:07:11 by guvillat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ t_env			*lst_add_lvl(t_env *lst)
 	tmp = lst;
 	tmp = lst_search_env("SHLVL", tmp);
 	i = ft_atoi(tmp->value);
-	++i;
+	i = i + 1;
 	tmp->value = ft_itoa(i);
 	return (lst);
 }
