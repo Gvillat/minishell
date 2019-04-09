@@ -3,43 +3,55 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gvillat <marvin@42.fr>                     +#+  +:+       +#+         #
+#    By: guvillat <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2017/05/22 15:53:57 by gvillat           #+#    #+#              #
-#    Updated: 2017/05/22 15:53:59 by gvillat          ###   ########.fr        #
+#    Created: 2019/04/01 13:14:43 by guvillat          #+#    #+#              #
+#    Updated: 2019/04/01 13:14:45 by guvillat         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-.PHONY: all re clean fclean norme
-
-NAME = minishell
+.PHONY: all clean fclean re norme
 
 CC = gcc
 
-CFLAGS = -Wall -Werror -Wextra
+FLAGS = -Wall -Wextra -Werror 
+NAME = minishell
 
-SRC =	sources/builtins.c \
-		sources/lst.c \
-		sources/cd_build_free.c \
-		sources/main.c\
-		sources/parse_and_exec.c \
-		sources/run.c \
+SRC_PATH = ./sources
+OBJ_PATH = ./.obj
 
-OBJ =	$(SRC:.c=.o)
+SRC_NAME =	builtins.c\
+			cd_build_free.c\
+			lst.c\
+			main.c\
+			parse_and_exec.c\
+			run.c\
+
+OBJ_NAME = $(SRC_NAME:.c=.o)
+
+SRC = $(addprefix $(SRC_PATH)/, $(SRC_NAME))
+OBJ = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	@make -C ./libft
-	@$(CC) $(FLAGS) -o $(NAME) $(SRC) libft/libft.a
+$(NAME): $(SRC)
+	@cd ./lib && $(MAKE) 
+	@$(CC) $(FLAGS) -o $@ $^ ./lib/libftprintf.a
+	@echo "\033[1;34mminishell\t\t\033[1;33mCompilation\t\033[0;32m-OK-\033[0m"
+
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
+	@mkdir $(OBJ_PATH) 2> /dev/null || true
+	@$(CC) $(FLAGS) -o $@ -c $<
 
 clean:
-	rm -rf sources/*.o
+	@rm -rf $(OBJ)
+	@cd ./lib/ && $(MAKE) clean
+	@echo "\033[1;34mminishell\t\033[1;33mCleaning obj\t\033[0;32m-OK-\033[0m"
 
 fclean: clean
-	rm -f $(NAME)
-
+	@rm -rf ./.obj $(NAME)
+	@rm -rf ./lib/libftprintf.a
+	@cd ./lib && $(MAKE) fclean
+	@echo "\033[1;34mminishell\t\033[1;33mCleaning lib\t\033[0;32m-OK-\033[0m"
+	
 re: fclean all
-
-norme:
-	@norminette */*[hc]
