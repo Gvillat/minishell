@@ -16,6 +16,7 @@ CC = clang
 
 CFLAGS = -Wall -Wextra -Werror
 LIBSRC = 	libft/ft_itoa_base.c \
+		 	libft/ft_split_whitespaces.c \
 			libft/ft_memset.c \
 			libft/ft_nputchar.c \
 			libft/ft_wstrtostr.c \
@@ -51,7 +52,6 @@ LIBSRC = 	libft/ft_itoa_base.c \
 			libft/ft_strlower.c\
 			libft/ft_strnew.c\
 			libft/ft_tolower.c\
-			libft/ft_countwords.c\
 			libft/ft_isprint.c\
 			libft/ft_lstmap.c\
 			libft/ft_memcpy.c\

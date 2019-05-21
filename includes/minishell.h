@@ -23,6 +23,7 @@
 # include <sys/stat.h>
 
 int g_running;
+int g_ret;
 
 typedef struct s_env	t_env;
 struct				s_env
@@ -33,6 +34,8 @@ struct				s_env
 	t_env			*next;
 	t_env			*prev;
 };
+
+t_env *g_lst;
 
 typedef struct		s_builtins
 {
@@ -53,11 +56,13 @@ t_env				*lst_del_env(char *name, t_env *lst);
 t_env				*lst_add_env(char **tmp, t_env *lst);
 t_env				*lst_search_env(char *name, t_env *lst);
 t_env				*lst_add_lvl(t_env *lst);
-char				**parse_and_exec(char **cmd, t_env **lst);
-void				print_error(char *from, char *str1, char *str2);
+char				**parse_tok(char *cmd, t_env *lst);
+t_env				*print_error(char *from, char *str1, char *str2, t_env *lst);
 void				run_path(char **cmd, t_env **lst);
 int					run_cmd(char **cmd, t_env **lst);
 int					run_builtins(char **cmd, t_env **lst);
 int					run_file(char **cmd, t_env **lst);
+t_env 				*build_no_env();
+
 
 #endif

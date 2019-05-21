@@ -18,31 +18,39 @@ t_env	*ft_env(char **args, t_env *lst)
 
 	(void)args;
 	if (!lst)
-		print_error("env: environnement introuvable", "", "");
-	tmp = lst;
-	while (tmp)
+		return (print_error("env: environnement introuvable", "", "", lst));
+	else
 	{
-		ft_printf("%s=%s\n", tmp->key, tmp->value);
-		tmp = tmp->next;
+		tmp = lst;
+		while (tmp)
+		{
+			ft_printf("%s=%s\n", tmp->key, tmp->value);
+			tmp = tmp->next;
+		}
 	}
 	return (lst);
 }
 
-t_env	*ft_setenv(char **args, t_env *lst)
+
+//overwrite !!!!!!
+t_env	*ft_setenv(char **args, t_env *lst) 
 {
 	char	*arg[2];
 	t_env	*tmp;
 
 	if (!args[1])
-		ft_env(args, lst);
+		return (print_error("setenv: pas d'argument", "", "", lst));
 	else
 	{
+		if (ft_strrchr(args[1], '='))
+			return (print_error("usage: setenv key value", "", "", lst));
 		arg[0] = args[1];
-		arg[1] = args[2];
-		if (!args[2])
-			arg[1] = "(null)";
+		(!args[2]) ? (arg[1] =  "(null)") : (arg[1] = args[2]);
 		if ((tmp = lst_search_env(arg[0], lst)))
-			tmp->value = arg[1];
+		{
+			if (args[2])
+				tmp->value = arg[1];
+		}
 		else
 			lst_add_env(arg, lst->next);
 	}
@@ -51,23 +59,53 @@ t_env	*ft_setenv(char **args, t_env *lst)
 
 t_env	*ft_unsetenv(char **args, t_env *lst)
 {
+	t_env	*tmp;
+	int		i;
+
+	i = 1;
 	if (!args[1])
-		print_error("Usage: unsetenv 'variable'", "", "");
+		return (print_error("Usage: unsetenv 'variable'", "", "", lst));
 	else
-		lst = lst_del_env(args[1], lst);
+	{
+		while (args[i])
+		{
+			if ((tmp = lst_search_env(args[i], lst)))
+				lst_del_env(args[i], tmp);
+			else
+				return (print_error("env: variable ", args[i], " introuvable", lst));
+			i++;
+		}
+	}
 	return (lst);
 }
 
 t_env	*ft_echo(char **args, t_env *lst)
 {
 	int i;
+	int n;
+	t_env *tmp;
 
 	i = 1;
-	while (args[i])
+	n = 0;
+	if (args[1] && (!ft_strcmp(args[1], "-n")))
 	{
-		ft_printf("%s ", args[i]);
+		n = 1;
 		i++;
 	}
-	ft_putchar('\n');
+	while (args[i])
+	{
+		if (args[i][0] == '$')
+		{
+			if ((tmp = lst_search_env(&args[i][1], lst)))
+				ft_printf("%s", tmp->value);
+			if (args[1][1] == '?')
+				ft_printf("%d", g_ret);
+		}
+		else
+			ft_printf("%s ", args[i]);
+		i++;
+	}
+	if (!n)
+		ft_putchar('\n');
 	return (lst);
 }

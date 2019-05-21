@@ -29,6 +29,7 @@ static int	finding_path(char **path, char **cmd, t_env **lst)
 		{
 			cmd[0] = ft_strsub(tmp[1], 0, ft_strlen(tmp[1]) + 1);
 			run_cmd(&cmd[0], lst);
+			free(tmp[1]);
 			return (1);
 		}
 		free(tmp[1]);
@@ -45,27 +46,58 @@ void		run_path(char **cmd, t_env **lst)
 	curr = NULL;
 	if ((curr = lst_search_env("PATH", *lst)) && curr)
 	{
-		path = ft_strsplit(curr->value, ':');
-		finding_path(path, cmd, lst);
-		free(path);
+		if ((path = ft_strsplit(curr->value, ":")))
+		{
+
+			finding_path(path, cmd, lst);
+			free(path);
+
+		}
 	}
+}
+
+
+void ft_exec_ret(pid_t cpid)
+{
+	pid_t w;
+	int status;
+
+    w = waitpid(cpid, &status, WUNTRACED | WCONTINUED);
+    if (w == -1)
+    {
+		ft_printf("waitpid: failed");
+        exit(0);
+    }
+    if (WIFEXITED(status))
+		g_ret = WEXITSTATUS(status);
+    else if (WIFSIGNALED(status))
+		ft_printf("tué par le signal %d\n", WTERMSIG(status));
+    else if (WIFSTOPPED(status))
+		ft_printf("arrêté par le signal %d\n", WSTOPSIG(status));
+    else if (WIFCONTINUED(status))
+        ft_printf("relancé\n");
 }
 
 int			run_cmd(char **cmd, t_env **lst)
 {
 	pid_t	father;
 	char	**tab;
-	int		status;
 
 	tab = NULL;
 	father = fork();
+	if (father == -1)
+	{
+		print_error("fork: ", "failed", "", *lst);
+        exit(0);
+    }
 	if (father)
-		waitpid(father, &status, 0);
+		ft_exec_ret(father);
 	else
 	{
 		tab = build_env_tab(*lst);
-		execve(cmd[0], cmd, tab);
+		g_ret = execve(cmd[0], cmd, tab);
 		free(tab);
+		exit(0);
 	}
 	return (0);
 }
@@ -92,16 +124,16 @@ int			run_builtins(char **cmd, t_env **lst)
 		i++;
 	}
 	return (0);
-}
+}	 	 	  	  	  
 
 int			run_file(char **cmd, t_env **lst)
 {
 	if (cmd[0][0] != '.' && cmd[0][0] != '/')
 		return (0);
 	if (access(*cmd, F_OK) == -1)
-		print_error("minishell: ", "no such file or directory: ", cmd[0]);
-	if (access(*cmd, X_OK) == -1)
-		print_error("minishell: ", "permission denied: ", cmd[0]);
+		print_error("minishell: ", "no such file or directory: ", cmd[0], *lst);
+	else if (access(*cmd, X_OK) == -1)
+		print_error("minishell: ", "permission denied: ", cmd[0], *lst);
 	else
 		run_cmd(cmd, lst);
 	return (1);

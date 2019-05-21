@@ -18,7 +18,7 @@ t_env			*lst_del_env(char *name, t_env *lst)
 
 	tmp = NULL;
 	if (!(lst = lst_search_env(name, lst)))
-		print_error("lst_search_env: variable introuvable", "", "");
+		return (print_error("lst_search_env: variable introuvable", "", "", lst));
 	else
 	{
 		if (lst->prev)
@@ -93,9 +93,11 @@ t_env			*lst_add_lvl(t_env *lst)
 	int		i;
 
 	tmp = lst;
-	tmp = lst_search_env("SHLVL", tmp);
-	i = ft_atoi(tmp->value);
-	i = i + 1;
-	tmp->value = ft_itoa(i);
+	if ((tmp = lst_search_env("SHLVL", tmp)))
+	{
+		i = ft_atoi(tmp->value);
+		i = i + 1;
+		tmp->value = ft_itoa(i);
+	}
 	return (lst);
 }
