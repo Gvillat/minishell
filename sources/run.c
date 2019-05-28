@@ -38,22 +38,23 @@ static int	finding_path(char **path, char **cmd, t_env **lst)
 	return (0);
 }
 
-void		run_path(char **cmd, t_env **lst)
+int		run_path(char **cmd, t_env **lst)
 {
 	t_env	*curr;
 	char	**path;
+	int 	ret;
 
 	curr = NULL;
+	ret = 0;
 	if ((curr = lst_search_env("PATH", *lst)) && curr)
 	{
 		if ((path = ft_strsplit(curr->value, ":")))
 		{
-
-			finding_path(path, cmd, lst);
+			ret = finding_path(path, cmd, lst);
 			free(path);
-
 		}
 	}
+	return (ret);
 }
 
 
@@ -87,7 +88,7 @@ int			run_cmd(char **cmd, t_env **lst)
 	father = fork();
 	if (father == -1)
 	{
-		print_error("fork: ", "failed", "", *lst);
+		print_error("fork: ", "failed", "");
         exit(0);
     }
 	if (father)
@@ -117,10 +118,7 @@ int			run_builtins(char **cmd, t_env **lst)
 	while (i < 6)
 	{
 		if (!ft_strcmp(cmd[0], builtins[i].name))
-		{
-			*lst = builtins[i].func(&cmd[0], *lst);
-			return (1);
-		}
+			return (builtins[i].func(&cmd[0], *lst));
 		i++;
 	}
 	return (0);
@@ -131,9 +129,9 @@ int			run_file(char **cmd, t_env **lst)
 	if (cmd[0][0] != '.' && cmd[0][0] != '/')
 		return (0);
 	if (access(*cmd, F_OK) == -1)
-		print_error("minishell: ", "no such file or directory: ", cmd[0], *lst);
+		print_error("minishell: ", "no such file or directory: ", cmd[0]);
 	else if (access(*cmd, X_OK) == -1)
-		print_error("minishell: ", "permission denied: ", cmd[0], *lst);
+		print_error("minishell: ", "permission denied: ", cmd[0]);
 	else
 		run_cmd(cmd, lst);
 	return (1);

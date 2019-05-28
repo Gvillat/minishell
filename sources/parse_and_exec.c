@@ -19,44 +19,18 @@
 // 	return (lst);
 // }
 
-t_env			*ft_tilted(char *args, t_env *lst)
+char			*ft_tilted(char *args, t_env *lst)
 {
 	t_env		*tmp;
-	char	buf[4096];
 
-	ft_memset(buf, 0, 4096);
 	tmp = lst;
-	if (args[0] == '~' && args[1] == '+')
-	{	
-		// go_to(lst_search_env("PWD", lst)->value, lst);
-		ft_strcat(buf, ft_strchr(args, '~'));
-		ft_strcat(buf, args);
-		args = ft_strdup(buf);
-		ft_printf("%s\n", args);
-		// go_to(args, tmp);
-		// free(buf);
-	}
-	else if (args[0] == '~' && args[1] == '-')
-	{
-		// go_to(lst_search_env("OLDPWD", lst)->value, lst);
-		ft_strcat(buf, lst_search_env("OLDPWD", tmp)->value);
-		ft_strcat(buf, args);
-		args = ft_strdup(buf);
-		ft_printf("%s\n", args);
-		// go_to(args, tmp);
-		// free(buf);
-	}
-	else
-	{
-		// go_to(lst_search_env("HOME", lst)->value, lst);
-		ft_strcat(buf, lst_search_env("HOME", tmp)->value);
-		ft_strcat(buf, args);
-		args = ft_strdup(buf);
-		ft_printf("%s\n", args);
-		// go_to(args, tmp);
-		// free(buf);
-	}
-	return (lst);
+	if (ft_strchr(args, '-') && (tmp = lst_search_env("OLDPWD", lst)))
+		args = ft_strjoin(tmp->value, ft_strrchr(args, '~') + 2);
+	else if (ft_strchr(args, '+') && (tmp = lst_search_env("PWD", lst)))
+		args = ft_strjoin(tmp->value, ft_strrchr(args, '~')+ 2);
+	else if (ft_strchr(args, '~') && (tmp = lst_search_env("HOME", lst)))
+		args = ft_strjoin(tmp->value, ft_strrchr(args, '~') + 1);
+	return (args);
 }
 
 
@@ -67,11 +41,8 @@ char *cmd_replacer(char *cmd, t_env *lst)
 
  	tmp = NULL;
 	tlst = NULL;
-	if ((ft_strequ(cmd, "~")) && (tlst = lst_search_env("HOME", lst)))
-	{
-		printf("toto\n");
-		ft_tilted(cmd, tlst);
-	}
+	if (ft_strchr(cmd, '~') && (lst_search_env("HOME", lst)))
+		cmd = ft_tilted(cmd, lst);
 	else if (((tmp = ft_strsplit(cmd, "=")) && tmp[0] && tmp[1] && !tmp[2]))
 	{
 		g_lst = lst_add_env(tmp, g_lst);
@@ -82,7 +53,20 @@ char *cmd_replacer(char *cmd, t_env *lst)
 	return (cmd);	
 }
 
-char			**parse_tok(char *cmd, t_env *lst)
+int exec_tok(char **cmd, t_env *lst)
+{
+	int i;
+
+	i = -1;
+	while (cmd[++i])
+		cmd[i] = cmd_replacer(cmd[i], lst);
+	if (!(run_file(cmd, &lst)) && !(run_builtins(cmd, &lst)))
+		if (!run_path(cmd, &lst))
+			return (print_error("minishell: ", "command not found: ", cmd[0]));
+	return (0);
+}
+
+int 	parse_tok(char *cmd, t_env *lst)
 {
 	char	**tab;
 	char	**tmp;
@@ -93,16 +77,12 @@ char			**parse_tok(char *cmd, t_env *lst)
 	{
 		while (*tab)
 		{
-			tmp = ft_strsplit(*tab, " \t");
-			while (*tmp)
-			{
-				*tmp = cmd_replacer(*tmp, lst);
-				tmp++;
-			}
-			if (!(run_file(tab, &lst)) && !(run_builtins(tab, &lst)))
-				run_path(tab, &lst);
+			if ((tmp = ft_strsplit(*tab, " \t")) && *tmp && lst)
+				exec_tok(tmp, lst);
 			tab++;
 		}
+		free(tmp);
 	}
-	return (tab);
+	// free(tab);
+	return (1);
 }

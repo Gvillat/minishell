@@ -41,9 +41,9 @@ t_env			*ft_cd(char **args, t_env *lst)
 	while (args[++i])
 	{
 		if (ft_strequ(args[i], "-") && lst_search_env("OLDPWD", lst))
+		{
 			go_to(lst_search_env("OLDPWD", lst)->value, lst);
-		// else if (args[i][0] == '~')
-		// 	ft_tilted(args[i], lst);
+		}
 		else
 			go_to(args[i], lst);
 	}

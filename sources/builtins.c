@@ -12,13 +12,13 @@
 
 #include "../includes/minishell.h"
 
-t_env	*ft_env(char **args, t_env *lst)
+int		ft_env(char **args, t_env *lst)
 {
 	t_env *tmp;
 
 	(void)args;
 	if (!lst)
-		return (print_error("env: environnement introuvable", "", "", lst));
+		return (print_error("env: environnement introuvable", "", ""));
 	else
 	{
 		tmp = lst;
@@ -28,43 +28,40 @@ t_env	*ft_env(char **args, t_env *lst)
 			tmp = tmp->next;
 		}
 	}
-	return (lst);
+	return (1);
 }
 
-
-//overwrite !!!!!!
-t_env	*ft_setenv(char **args, t_env *lst) 
+int		ft_setenv(char **args, t_env *lst) 
 {
-	char	*arg[2];
-	t_env	*tmp;
+	char	*tmp[2];
+	t_env	*tlst;
 
 	if (!args[1])
-		return (print_error("setenv: pas d'argument", "", "", lst));
+		return (print_error("setenv: pas d'argument", "", ""));
+	else if (args [4])
+		return (print_error("setenv: trop d'argument", "", ""));
 	else
 	{
 		if (ft_strrchr(args[1], '='))
-			return (print_error("usage: setenv key value", "", "", lst));
-		arg[0] = args[1];
-		(!args[2]) ? (arg[1] =  "(null)") : (arg[1] = args[2]);
-		if ((tmp = lst_search_env(arg[0], lst)))
-		{
-			if (args[2])
-				tmp->value = arg[1];
-		}
-		else
-			lst_add_env(arg, lst->next);
+			return (print_error("usage: setenv key value overwrite", "", ""));
+		tmp[0] = args[1];
+		(!args[2]) ? (tmp[1] =  "(null)") : (tmp[1] = args[2]);
+		if ((tlst = lst_search_env(tmp[0], lst)) && args[3] && ft_atoi(args[3]) && args[2])
+				tlst->value = tmp[1];
+		else if (!lst_search_env(tmp[0], lst))
+			lst_add_env(tmp, lst->next);
 	}
-	return (lst);
+	return (1);
 }
 
-t_env	*ft_unsetenv(char **args, t_env *lst)
+int		ft_unsetenv(char **args, t_env *lst)
 {
 	t_env	*tmp;
 	int		i;
 
 	i = 1;
 	if (!args[1])
-		return (print_error("Usage: unsetenv 'variable'", "", "", lst));
+		return (print_error("Usage: unsetenv 'variable'", "", ""));
 	else
 	{
 		while (args[i])
@@ -72,14 +69,14 @@ t_env	*ft_unsetenv(char **args, t_env *lst)
 			if ((tmp = lst_search_env(args[i], lst)))
 				lst_del_env(args[i], tmp);
 			else
-				return (print_error("env: variable ", args[i], " introuvable", lst));
+				return (print_error("env: variable ", args[i], " introuvable"));
 			i++;
 		}
 	}
-	return (lst);
+	return (1);
 }
 
-t_env	*ft_echo(char **args, t_env *lst)
+int		ft_echo(char **args, t_env *lst)
 {
 	int i;
 	int n;
@@ -107,5 +104,5 @@ t_env	*ft_echo(char **args, t_env *lst)
 	}
 	if (!n)
 		ft_putchar('\n');
-	return (lst);
+	return (1);
 }

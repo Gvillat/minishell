@@ -12,19 +12,19 @@
 
 #include "../includes/minishell.h"
 
-static t_env	*go_to(char *path, t_env *lst)
+static int go_to(char *path, t_env *lst)
 {
 	static struct stat	st;
 	char				*str;
 
 	if (access(path, F_OK) == -1)
-		return (print_error("cd: ", "no such file or directory: ", path, lst));
+		return (print_error("cd: ", "no such file or directory: ", path));
 	if (stat(path, &st) == -1)
-		return (print_error("cd: ", "stat error: ", path, lst));
+		return (print_error("cd: ", "stat error: ", path));
 	if (!(S_ISDIR(st.st_mode)))
-		return (print_error("cd: ", "not a directory: ", path, lst));
+		return (print_error("cd: ", "not a directory: ", path));
 	if (access(path, R_OK) == -1)
-		return (print_error("cd: ", "permission denied: ", path, lst));
+		return (print_error("cd: ", "permission denied: ", path));
 	if ((lst = lst_search_env("PWD", lst)))
 	{
 		str = lst->value;
@@ -36,35 +36,34 @@ static t_env	*go_to(char *path, t_env *lst)
 	}
 	if ((lst = lst_search_env("OLDPWD", lst)))
 		lst->value = str;
-	return (lst);
+	return (1);
 }
 
-t_env			*ft_cd(char **args, t_env *lst)
+int 	ft_cd(char **args, t_env *lst)
 {
 	int		i;
 
-	if (!lst_search_env("HOME", lst))
-	{
-		ft_printf("minishell: cd: HOME not set\n");
-		return (lst);
-	}
+	if (!lst_search_env("HOME", lst) && !args[1])
+		return (print_error("minishell: cd: HOME not set ", "", ""));
 	if (ft_strequ(args[0], "cd") && !args[1] && lst_search_env("HOME", lst))
 		go_to(lst_search_env("HOME", lst)->value, lst);
 	i = 0;
 	while (args[++i])
 	{
 		if (ft_strequ(args[i], "-") && lst_search_env("OLDPWD", lst))
+		{
+			ft_printf("%s\n", lst_search_env("OLDPWD", lst)->value);
 			go_to(lst_search_env("OLDPWD", lst)->value, lst);
-		// else if (args[i][0] == '~')
-		// 	ft_tilted(args[i], lst);
+		}
 		else
 			go_to(args[i], lst);
 	}
-	return (lst);
+	return (1);
 }
 
 t_env *build_no_env(void)
 {
+	
 	char *tmp[4];
 	char **str;
 	char pwd[4096];

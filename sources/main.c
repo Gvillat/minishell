@@ -15,27 +15,30 @@
 int g_running = 1;
 int g_ret = 0;
 
-t_env			*ft_exit(char **args, t_env *lst)
+int 		ft_exit(char **args, t_env *lst)
 {
-	if (args[1])
+	(void)lst;
+	if (!args[1])	// free_lst(lst);
+		exit (0);
+	else if (args[1] && !args[2])
 	{
 		g_ret = ft_atoi(args[1]);
 		exit (g_ret);
 		g_running = 0;
 	}
 	else
-		g_running = 0;
-	return (lst);
+		return (print_error("exit: ", "too many arguments", ""));
+	return (0);
 }
 
-t_env			*print_error(char *from, char *str1, char *str2, t_env *lst)
+int 		print_error(char *from, char *str1, char *str2)
 {
 	ft_putstr_fd(from, 2);
 	if (str1)
 		ft_putstr_fd(str1, 2);
 	if (str2)
 		ft_putendl_fd(str2, 2);
-	return (lst);
+	return (-1);
 }
 
 void			print_prompt(t_env *lst)
@@ -54,9 +57,7 @@ static void		sig_handler(int id)
 {
 	if (id == SIGINT)
 	{
-		g_running = 0;
-		ft_putchar('\n');
-		return ;
+		ft_printf("$>");
 	}
 }
 
@@ -75,6 +76,7 @@ int				main(int ac, char **av, char **env)
 	cmd = NULL;	
 	(void)ac;
 	(void)av;
+	signal(SIGINT, sig_handler);
 	if (!(lst = build_lst_env(env, lst)))
 		lst = build_no_env();
 	else
@@ -87,11 +89,10 @@ int				main(int ac, char **av, char **env)
 			g_running = 0;
 		else
 		{
-			cmd = parse_tok(line, lst);
+			parse_tok(line, lst);
 			free(line);
 		}
 	}
-	signal(SIGINT, sig_handler);
 	return (g_ret);
 }
 
