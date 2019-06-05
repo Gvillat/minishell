@@ -36,7 +36,7 @@ static int	finding_path(char **path, char **cmd, t_env **lst)
 		i++;
 	}
 	return (0);
-}
+}	
 
 int		run_path(char **cmd, t_env **lst)
 {
@@ -97,7 +97,8 @@ int			run_cmd(char **cmd, t_env **lst)
 	{
 		tab = build_env_tab(*lst);
 		g_ret = execve(cmd[0], cmd, tab);
-		free(tab);
+		// ft_free_tab(&tab);
+		// ft_free_lst(*lst);
 		exit(0);
 	}
 	return (0);
@@ -118,7 +119,10 @@ int			run_builtins(char **cmd, t_env **lst)
 	while (i < 6)
 	{
 		if (!ft_strcmp(cmd[0], builtins[i].name))
-			return (builtins[i].func(&cmd[0], *lst));
+		{
+			*lst = builtins[i].func(&cmd[0], *lst);
+			return (1);
+		}
 		i++;
 	}
 	return (0);

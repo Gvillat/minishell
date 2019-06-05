@@ -40,15 +40,16 @@ t_env *g_lst;
 typedef struct		s_builtins
 {
 	char			*name;
-	int				(*func)(char **args, t_env *lst);
+	t_env			*(*func)(char **args, t_env *lst);
 }					t_builtins;
-
-int 				ft_exit(char **args, t_env *lst);
-int 				ft_env(char **args, t_env *lst);
-int 				ft_setenv(char **args, t_env *lst);
-int 				ft_unsetenv(char **args, t_env *lst);
-int 				ft_echo(char **args, t_env *lst);
-int 				ft_cd(char **args, t_env *lst);
+void ft_free_tab(char ***tab);
+void ft_free_lst(t_env *lst);
+t_env 				*ft_exit(char **args, t_env *lst);
+t_env 				*ft_env(char **args, t_env *lst);
+t_env 				*ft_setenv(char **args, t_env *lst);
+t_env 				*ft_unsetenv(char **args, t_env *lst);
+t_env 				*ft_echo(char **args, t_env *lst);
+t_env 				*ft_cd(char **args, t_env *lst);
 void				free_lst(t_env *lst);
 t_env				*build_lst_env(char **env, t_env *lst);
 char				**build_env_tab(t_env *lst);
@@ -56,7 +57,7 @@ t_env				*lst_del_env(char *name, t_env *lst);
 t_env				*lst_add_env(char **tmp, t_env *lst);
 t_env				*lst_search_env(char *name, t_env *lst);
 t_env				*lst_add_lvl(t_env *lst);
-int					parse_tok(char *cmd, t_env *lst);
+t_env				*parse_tok(char *cmd, t_env *lst);
 int 				print_error(char *from, char *str1, char *str2);
 int					run_path(char **cmd, t_env **lst);
 int					run_cmd(char **cmd, t_env **lst);

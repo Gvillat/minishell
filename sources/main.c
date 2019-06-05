@@ -15,20 +15,34 @@
 int g_running = 1;
 int g_ret = 0;
 
-int 		ft_exit(char **args, t_env *lst)
+void ft_free_lst(t_env *lst)
 {
-	(void)lst;
+	t_env *tmp;
+
+	tmp = lst;
+	while (tmp)
+	{
+		tmp = lst->next;
+		free(lst);
+		lst = tmp;
+	}
+}
+
+
+t_env		*ft_exit(char **args, t_env *lst)
+{
 	if (!args[1])	// free_lst(lst);
 		exit (0);
 	else if (args[1] && !args[2])
 	{
 		g_ret = ft_atoi(args[1]);
+		ft_free_lst(lst);
 		exit (g_ret);
 		g_running = 0;
 	}
 	else
-		return (print_error("exit: ", "too many arguments", ""));
-	return (0);
+		print_error("exit: ", "too many arguments", "");
+	return (lst);
 }
 
 int 		print_error(char *from, char *str1, char *str2)
@@ -61,45 +75,34 @@ static void		sig_handler(int id)
 	}
 }
 
-int				main(int ac, char **av, char **env)
+int				main(void)
 {
 	t_env	*lst;
-	t_env	*tlst;
 	char	*line;
-	char	**cmd;
-	t_env *tmp;
+	extern char **environ;
 
  	g_lst = NULL;	
 	lst = NULL;
-	tlst = NULL;
 	line = NULL;
-	cmd = NULL;	
-	(void)ac;
-	(void)av;
 	signal(SIGINT, sig_handler);
-	if (!(lst = build_lst_env(env, lst)))
+	if (!(lst = build_lst_env(environ, lst)))
 		lst = build_no_env();
 	else
 		lst_add_lvl(lst);
 	while (g_running)
 	{
-		tmp = lst;
-		print_prompt(tmp);
+		print_prompt(lst);
 		if (!get_next_line(0, &line))
 			g_running = 0;
 		else
 		{
-			parse_tok(line, lst);
+			lst = parse_tok(line, lst);
 			free(line);
 		}
 	}
+	// ft_free_lst(lst);
+	// if (g_lst)
+		// ft_free_lst(g_lst);
+	// while (1);
 	return (g_ret);
 }
-
-// 
-		
-// 		parse_and_exec(&cmd, &lst);
-// 		// ft_memdel((void **)&cmd);
-// 	}
-// 	(void)argc;
-// 	(void)argv;

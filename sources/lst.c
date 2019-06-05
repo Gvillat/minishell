@@ -19,8 +19,8 @@ t_env			*lst_del_env(char *name, t_env *lst)
 	tmp = NULL;
 	if (!(lst = lst_search_env(name, lst)))
 	{
-		print_error("lst_search_env: variable introuvable", "", "");
-		return (NULL);
+		print_error("unsetenv: variable ", name, " introuvable");
+		return (lst);
 	}
 	else
 	{

@@ -12,6 +12,18 @@
 
 #include "../includes/minishell.h"
 
+void ft_free_tab(char ***tab)
+{
+	char **tmp;
+
+	tmp = *tab;
+	if (*tmp)
+	{
+		free(*tmp);
+		tmp = *tab++;
+	}
+}
+
 static int go_to(char *path, t_env *lst)
 {
 	static struct stat	st;
@@ -39,31 +51,35 @@ static int go_to(char *path, t_env *lst)
 	return (1);
 }
 
-int 	ft_cd(char **args, t_env *lst)
+t_env 	*ft_cd(char **args, t_env *lst)
 {
-	int		i;
-
 	if (!lst_search_env("HOME", lst) && !args[1])
-		return (print_error("minishell: cd: HOME not set ", "", ""));
+	{
+		print_error("minishell: cd: HOME not set ", "", "");
+		return (lst);
+	}
+	if (args[2] && args[1])
+	{
+		print_error("cd: too many arguments", "", "");
+		return (lst);
+	}
 	if (ft_strequ(args[0], "cd") && !args[1] && lst_search_env("HOME", lst))
 		go_to(lst_search_env("HOME", lst)->value, lst);
-	i = 0;
-	while (args[++i])
+	if (args[1])
 	{
-		if (ft_strequ(args[i], "-") && lst_search_env("OLDPWD", lst))
+		if (ft_strequ(args[1], "-") && lst_search_env("OLDPWD", lst))
 		{
 			ft_printf("%s\n", lst_search_env("OLDPWD", lst)->value);
 			go_to(lst_search_env("OLDPWD", lst)->value, lst);
 		}
 		else
-			go_to(args[i], lst);
+			go_to(args[1], lst);
 	}
-	return (1);
+	return (lst);
 }
 
 t_env *build_no_env(void)
-{
-	
+{	
 	char *tmp[4];
 	char **str;
 	char pwd[4096];
@@ -83,6 +99,7 @@ t_env *build_no_env(void)
 	{
 		str = ft_strsplit(tmp[i], "=");
 		tlst = lst_add_env(str, tlst);
+		ft_free_tab(&str);
 		i++;
 	}
 	return (tlst);
@@ -104,7 +121,7 @@ t_env			*build_lst_env(char **env, t_env *lst)
 		tmp = ft_strsplit(env[i], "=");
 		lst = lst_add_env(tmp, lst);
 		i++;
-		free(tmp);
+		// ft_free_tab(&tmp);
 	}
 	if (!(tlst = lst_search_env("PROMPT", lst)) && lst)
 		lst_add_env(prpt, lst);

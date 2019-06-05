@@ -12,6 +12,17 @@
 
 #include "../includes/ft_printf.h"
 
+int	ft_strfulldigit(char *str)
+{
+	while (*str)
+	{
+		if (ft_isdigit(*str))
+			return (1);
+		str++;
+	}
+	return (0);
+}
+
 int	ft_isdigit(int c)
 {
 	return ((c >= '0' && c <= '9') ? 1 : 0);
