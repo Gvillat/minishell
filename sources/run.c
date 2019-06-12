@@ -51,7 +51,7 @@ int		run_path(char **cmd, t_env **lst)
 		if ((path = ft_strsplit(curr->value, ":")))
 		{
 			ret = finding_path(path, cmd, lst);
-			free(path);
+			ft_free_tab(&path);
 		}
 	}
 	return (ret);
@@ -97,9 +97,8 @@ int			run_cmd(char **cmd, t_env **lst)
 	{
 		tab = build_env_tab(*lst);
 		g_ret = execve(cmd[0], cmd, tab);
-		// ft_free_tab(&tab);
+		ft_free_tab(&tab);
 		// ft_free_lst(*lst);
-		exit(0);
 	}
 	return (0);
 }

@@ -12,16 +12,22 @@
 
 #include "../includes/minishell.h"
 
-void ft_free_tab(char ***tab)
+void		ft_free_tab(char ***tab)
 {
-	char **tmp;
+	char	**tmp;
+	size_t	i;
 
+	if (!*tab)
+		return ;
 	tmp = *tab;
-	if (*tmp)
+	i = 0;
+	if (*tab)
 	{
-		free(*tmp);
-		tmp = *tab++;
+		while (tmp[i])
+			free(tmp[i++]);
+		free(*tab);
 	}
+	*tab = NULL;
 }
 
 static int go_to(char *path, t_env *lst)
@@ -109,11 +115,10 @@ t_env			*build_lst_env(char **env, t_env *lst)
 {
 	char	**tmp;
 	int		i;
-	char	*prpt[2];
-	t_env 	*tlst;
+	// char	*prpt[2];
 
-	prpt[0] = "PROMPT";
-	prpt[1] = "$>";
+	// prpt[0] = "PROMPT";
+	// prpt[1] = "$>";
 	i = 0;
 	lst = NULL;
 	while (env[i])
@@ -123,9 +128,24 @@ t_env			*build_lst_env(char **env, t_env *lst)
 		i++;
 		// ft_free_tab(&tmp);
 	}
-	if (!(tlst = lst_search_env("PROMPT", lst)) && lst)
-		lst_add_env(prpt, lst);
+	// if (!(lst_search_env("PROMPT", lst)) && lst)
+		// lst_add_env(prpt, lst);
 	return (lst);
+}
+
+int getting_size_lst(t_env *lst)
+{
+	t_env *tlst;
+	int i;
+
+	i = 0;
+	tlst = lst;
+	while (tlst)
+	{
+		i++;
+		tlst = tlst->next;
+	}
+	return (i);
 }
 
 char			**build_env_tab(t_env *lst)
@@ -133,38 +153,21 @@ char			**build_env_tab(t_env *lst)
 	int		i;
 	int		j;
 	char	**tab;
-	char	*tmp;
-	t_env	*tlst;
+	char	*tmp[2];
 
-	i = 0;
+	i = getting_size_lst(lst);
 	j = -1;
-	tlst = lst;
-	while (tlst)
-	{
-		i++;
-		tlst = tlst->next;
-	}
 	if (!(tab = (char**)ft_memalloc(sizeof(char *) * i)))
 		return (NULL);
 	tab[i] = NULL;
 	while (lst && j++ < i)
 	{
-		tmp = ft_strjoin(ft_strjoin(lst->key, "="), lst->value);
-		tab[j] = ft_strdup(tmp);
+		tmp[1] = ft_strjoin(lst->key, "=");
+		tmp[0] = ft_strjoin(tmp[1], lst->value);
+		tab[j] = ft_strdup(tmp[0]);
 		lst = lst->next;
-		free(tmp);
+		free(tmp[0]);
+		free(tmp[1]);
 	}
 	return (tab);
-}
-
-void			free_lst(t_env *lst)
-{
-	t_env *curr;
-
-	while (lst)
-	{
-		curr = lst;
-		free(curr);
-		lst = lst->next;
-	}
 }

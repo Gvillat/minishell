@@ -1,4 +1,4 @@
-/* ************************************************************************** */
+ /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
@@ -62,9 +62,9 @@ int					get_next_line(int const fd, char **line)
 	int				res;
 
 	if (fd < 0 || BUFF_SIZE < 1 || !line || read(fd, buff, 0) < 0)
-		return (-1);
+		return (0);
 	if (!(save[fd]) && (save[fd] = ft_strnew(0)) == NULL)
-		return (-1);
+		return (0);
 	while (!(ft_strchr(save[fd], '\n')) &&
 			(res = read(fd, buff, BUFF_SIZE)) > 0)
 	{
@@ -76,6 +76,5 @@ int					get_next_line(int const fd, char **line)
 	*line = ft_strsub(save[fd], 0, ft_strclen(save[fd]));
 	if (ft_chrandcpy(save[fd]) == NULL)
 		return (0);
-	
 	return (1);
 }

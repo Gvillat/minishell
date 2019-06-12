@@ -42,7 +42,7 @@ typedef struct		s_builtins
 	char			*name;
 	t_env			*(*func)(char **args, t_env *lst);
 }					t_builtins;
-void ft_free_tab(char ***tab);
+void		ft_free_tab(char ***tab);
 void ft_free_lst(t_env *lst);
 t_env 				*ft_exit(char **args, t_env *lst);
 t_env 				*ft_env(char **args, t_env *lst);
@@ -57,7 +57,7 @@ t_env				*lst_del_env(char *name, t_env *lst);
 t_env				*lst_add_env(char **tmp, t_env *lst);
 t_env				*lst_search_env(char *name, t_env *lst);
 t_env				*lst_add_lvl(t_env *lst);
-t_env				*parse_tok(char *cmd, t_env *lst);
+t_env				*parse_tok(char *line, t_env *lst);
 int 				print_error(char *from, char *str1, char *str2);
 int					run_path(char **cmd, t_env **lst);
 int					run_cmd(char **cmd, t_env **lst);

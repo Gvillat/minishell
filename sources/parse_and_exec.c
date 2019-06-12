@@ -36,17 +36,18 @@ char *cmd_replacer(char *cmd, t_env *lst)
 	tlst = NULL;
 	if (ft_strchr(cmd, '~') && (lst_search_env("HOME", lst)))
 		return (cmd = ft_tilted(cmd, lst));
-	if (((tmp = ft_strsplit(cmd, "=")) && tmp[0] && tmp[1] && !tmp[2]))
+	else if (((tmp = ft_strsplit(cmd, "=")) && tmp[0] && tmp[1] && !tmp[2]))
 	{
 		g_lst = lst_add_env(tmp, g_lst);
-		free(tmp);
+		ft_free_tab(&tmp);
 		free(cmd);
-		return ("test");
+		return (ft_strdup("test"));
 	}
-	if (cmd[0] == '$' && &cmd[1] && g_lst && (tlst = lst_search_env(&cmd[1], g_lst)))
+	else if (cmd[0] == '$' && &cmd[1] && g_lst
+		&& (tlst = lst_search_env(&cmd[1], g_lst)))
 	{
 		free(cmd);
-		return (cmd = ft_strdup(tlst->value));
+		return (cmd = tlst->value);
 	}
 	return (cmd);	
 }
@@ -64,24 +65,25 @@ t_env *exec_tok(char **cmd, t_env *lst)
 	return (lst);
 }
 
-t_env 	*parse_tok(char *cmd, t_env *lst)
+t_env 	*parse_tok(char *line, t_env *lst)
 {
-	char	**tab;
 	char	**tmp;
+	char	**tab;
+	int 	i;
 
-	tab = NULL;
+	i = 0;
 	tmp = NULL;
-	if ((tab = ft_strsplit(cmd, ";")) && *tab)
+	tab = ft_strsplit(line, ";");
+	while (tab[i])
 	{
-		while (*tab)
+		if ((tmp = ft_strsplit(tab[i], " \t")) && *tmp && lst)
 		{
-			if ((tmp = ft_strsplit(*tab, " \t")) && *tmp && lst)
-				lst = exec_tok(tmp, lst);
-			tab++;
+			lst = exec_tok(tmp, lst);
+			ft_free_tab(&tmp);
 		}
-		free(tmp);
+		// ft_free_tab(&tmp);
+		i++;
 	}
-	// if (tab)
-		// free(tab);
+	ft_free_tab(&tab);
 	return (lst);
 }
