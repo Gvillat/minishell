@@ -22,6 +22,7 @@ void ft_free_lst(t_env *lst)
 	tmp = lst;
 	while (tmp)
 	{
+		// ft_printf("%s\n", lst->key);
 		tmp = lst->next;
 		free(lst->value);
 		free(lst->key);
@@ -38,13 +39,15 @@ t_env		*ft_exit(char **args, t_env *lst)
 		ft_free_lst(lst);
 		if (g_lst)
 			ft_free_lst(g_lst);
+		ft_free_tab(args);
 		exit (0);
 
-	}	// free_lst(lst);
+	}
 	else if (args[1] && !args[2])
 	{
 		g_ret = ft_atoi(args[1]);
 		ft_free_lst(lst);
+		ft_free_tab(args);
 		exit (g_ret);
 		g_running = 0;
 	}
@@ -108,13 +111,10 @@ int				main(void)
 		else
 		{
 			lst = parse_tok(line, lst);
-			free(line);
 		}
 	}
-	ft_printf("toto\n");
 	ft_free_lst(lst);
 	if (g_lst)
 		ft_free_lst(g_lst);
-	// while (1);
 	return (g_ret);
 }

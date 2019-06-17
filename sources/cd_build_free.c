@@ -12,22 +12,21 @@
 
 #include "../includes/minishell.h"
 
-void		ft_free_tab(char ***tab)
+
+void		ft_free_tab(char **tab)
 {
 	char	**tmp;
 	size_t	i;
 
-	if (!*tab)
-		return ;
-	tmp = *tab;
+	tmp = tab;
 	i = 0;
-	if (*tab)
+	if (tmp)
 	{
 		while (tmp[i])
 			free(tmp[i++]);
-		free(*tab);
+		free(tmp);
 	}
-	*tab = NULL;
+	tab = NULL;
 }
 
 static int go_to(char *path, t_env *lst)
@@ -35,6 +34,7 @@ static int go_to(char *path, t_env *lst)
 	static struct stat	st;
 	char				*str;
 
+	str = NULL;
 	if (access(path, F_OK) == -1)
 		return (print_error("cd: ", "no such file or directory: ", path));
 	if (stat(path, &st) == -1)
@@ -45,21 +45,29 @@ static int go_to(char *path, t_env *lst)
 		return (print_error("cd: ", "permission denied: ", path));
 	if ((lst = lst_search_env("PWD", lst)))
 	{
+		ft_printf("%s\n", path);
 		str = lst->value;
 		if (!chdir(path))
 		{
 			path = getcwd(NULL, 0);
-			lst->value = path;
+			free(lst->value);
+			lst->value = ft_strdup(path);
 		}
 	}
 	if ((lst = lst_search_env("OLDPWD", lst)))
-		lst->value = str;
+	{	
+		free(lst->value);
+		lst->value = ft_strdup(str);
+	}
 	return (1);
 }
 
 t_env 	*ft_cd(char **args, t_env *lst)
 {
-	if (!lst_search_env("HOME", lst) && !args[1])
+	t_env *tlst;
+
+	tlst = NULL;
+	if (!lst_search_env("HOME", lst) && !args[1] )
 	{
 		print_error("minishell: cd: HOME not set ", "", "");
 		return (lst);
@@ -69,15 +77,12 @@ t_env 	*ft_cd(char **args, t_env *lst)
 		print_error("cd: too many arguments", "", "");
 		return (lst);
 	}
-	if (ft_strequ(args[0], "cd") && !args[1] && lst_search_env("HOME", lst))
-		go_to(lst_search_env("HOME", lst)->value, lst);
+	if (ft_strequ(args[0], "cd") && !args[1] && (tlst = lst_search_env("HOME", lst)))
+		go_to(tlst->value, lst);
 	if (args[1])
 	{
-		if (ft_strequ(args[1], "-") && lst_search_env("OLDPWD", lst))
-		{
-			ft_printf("%s\n", lst_search_env("OLDPWD", lst)->value);
-			go_to(lst_search_env("OLDPWD", lst)->value, lst);
-		}
+		if (ft_strequ(args[1], "-") && (tlst = lst_search_env("OLDPWD", lst)))
+			go_to(tlst->value, lst);
 		else
 			go_to(args[1], lst);
 	}
@@ -105,7 +110,7 @@ t_env *build_no_env(void)
 	{
 		str = ft_strsplit(tmp[i], "=");
 		tlst = lst_add_env(str, tlst);
-		ft_free_tab(&str);
+		ft_free_tab(str);
 		i++;
 	}
 	return (tlst);
@@ -115,23 +120,25 @@ t_env			*build_lst_env(char **env, t_env *lst)
 {
 	char	**tmp;
 	int		i;
-	// char	*prpt[2];
+	char	*prpt[2];
 
-	// prpt[0] = "PROMPT";
-	// prpt[1] = "$>";
+	prpt[0] = ft_strdup("PROMPT");
+	prpt[1] = ft_strdup("$>");
 	i = 0;
 	lst = NULL;
 	while (env[i])
 	{
 		tmp = ft_strsplit(env[i], "=");
 		lst = lst_add_env(tmp, lst);
+		ft_free_tab(tmp);
 		i++;
-		// ft_free_tab(&tmp);
 	}
-	// if (!(lst_search_env("PROMPT", lst)) && lst)
-		// lst_add_env(prpt, lst);
+	if (!(lst_search_env("PROMPT", lst)) && lst)
+		lst_add_env(prpt, lst);
+	free(prpt[0]);
+	free(prpt[1]);
 	return (lst);
-}
+}	
 
 int getting_size_lst(t_env *lst)
 {

@@ -53,10 +53,11 @@ static t_env	*lst_new_env(char **name, t_env *lst)
 	}
 	new->key = ft_strdup(name[0]);
 	new->value = ft_strdup(name[1]);
+	// new->key = name[0];
+	// new->value = name[1];
 	new->size = size + 1;
 	new->next = NULL;
 	new->prev = lst;
-	ft_free_tab(&name);
 	return (new);
 }
 
@@ -94,14 +95,17 @@ t_env			*lst_search_env(char *name, t_env *lst)
 t_env			*lst_add_lvl(t_env *lst)
 {
 	int		i;
+	char 	*tmp;
 
+	tmp = NULL;
 	if ((lst = lst_search_env("SHLVL", lst)))
 	{
 		i = ft_atoi(lst->value);
 		i = i + 1;
+		free(lst->value);
 		lst->value = ft_itoa(i);
 	}
-	while (lst->prev)
+	while (lst)
 		lst = lst->prev;
 	return (lst);
 }

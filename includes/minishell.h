@@ -42,7 +42,7 @@ typedef struct		s_builtins
 	char			*name;
 	t_env			*(*func)(char **args, t_env *lst);
 }					t_builtins;
-void		ft_free_tab(char ***tab);
+void		ft_free_tab(char **tab);
 void ft_free_lst(t_env *lst);
 t_env 				*ft_exit(char **args, t_env *lst);
 t_env 				*ft_env(char **args, t_env *lst);

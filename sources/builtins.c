@@ -55,7 +55,6 @@ t_env		*ft_unsetenv(char **args, t_env *lst)
 {
 	t_env *tmp;
 
-	tmp = lst;
 	if (!args[1] || args[2])
 		print_error("usage: unsetenv key value overwrite", "", "");
 	if ((tmp = lst_search_env(args[1], lst)))
